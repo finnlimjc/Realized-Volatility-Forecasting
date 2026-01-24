@@ -85,7 +85,7 @@ class RecursiveHAR:
         weekly : Number of observations to use for the weekly rolling average (typically 5 for trading days).
         monthly : Number of observations to use for the monthly rolling average (typically 22 for trading days).
     """
-    def __init__(self, volatility_measure:pd.Series, weekly:int=5, monthly:int=22):
+    def __init__(self, volatility_measure:pd.DataFrame, weekly:int=5, monthly:int=22):
         self.data = volatility_measure.copy()
         self.days_by_period = {
             'weekly': weekly,
@@ -179,7 +179,7 @@ class RecursiveHAR:
         return mse
 
 class OptimizedRecursiveHAR(RecursiveHAR):
-    def __init__(self, volatility_measure:pd.Series, weekly:int=5, monthly:int=22):
+    def __init__(self, volatility_measure:pd.DataFrame, weekly:int=5, monthly:int=22):
         super().__init__(volatility_measure, weekly, monthly)
     
     @staticmethod
@@ -217,7 +217,7 @@ class DirectHAR(RecursiveHAR):
     - Never feeds forecasted values back into regressors
     - Redefines the dependent variable as a future rolling average
     """
-    def __init__(self, volatility_measure:pd.Series, weekly:int=5, monthly:int=22):
+    def __init__(self, volatility_measure:pd.DataFrame, weekly:int=5, monthly:int=22):
         super().__init__(volatility_measure, weekly, monthly)
     
     def _build_target(self, horizon:int) -> pd.Series:
