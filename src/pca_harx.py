@@ -4,6 +4,38 @@ from sklearn.decomposition import PCA
 from sklearn.linear_model import LinearRegression
 from sklearn.preprocessing import StandardScaler
 
+from src.data_io import YahooFinance
+
+def format_yf_df(price_df:pd.DataFrame, col_name:str='Close', date_format:str='%d/%m/%Y') -> pd.DataFrame:
+    df = price_df.loc[:, ['date', col_name]]
+    df = df.set_index('date')
+    df.index = pd.to_datetime(df.index, format=date_format)
+    return df
+
+def get_exo_df(start_date, end_date) -> pd.DataFrame:
+    exo_symbols = ['^VIX', '^VVIX', '^MOVE', '^GVZ', '^OVX']
+    exo_df = []
+    
+    for s in exo_symbols:
+        params = {
+            'symbol': s,
+            'start_date': start_date,
+            'end_date': end_date,
+            'interval': '1d'
+        }
+        tmp = YahooFinance(**params)
+        tmp_df = tmp.pipeline()
+        tmp = format_yf_df(tmp_df)
+        tmp.columns = [s]
+        exo_df.append(tmp)
+
+    exo_df = pd.concat(exo_df, axis=1)
+    exo_df.index = pd.to_datetime(exo_df.index, format='%d/%m/%Y')
+    exo_df = exo_df.sort_index(ascending=True)
+    
+    scaled_exo_df = np.log(exo_df/ exo_df.shift(1))
+    return scaled_exo_df
+
 class PCADirectHARX:
     def __init__(self, volatility_measure:pd.DataFrame, exo_df:pd.DataFrame, weekly:int=5, monthly:int=22):
         self.vix_names = ['^VIX', '^VVIX']

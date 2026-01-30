@@ -69,4 +69,19 @@ class AlpacaStockData:
             end=str(end)
         )
         
-        return self.client.get_stock_bars(request).df
+        intraday_df = self.client.get_stock_bars(request).df
+        intraday_df.index = intraday_df.index.droplevel(0)
+        return intraday_df
+    
+    def intraday_rv(intraday_df:pd.DataFrame, date_format:str='%d/%m/%Y') -> pd.Series:
+        df = intraday_df.copy()
+        df['log_returns'] = np.log(df['close']).diff()
+        rv = (
+            df['log_returns'].dropna()
+            .pow(2)
+            .resample("1D")
+            .sum()
+        )
+        rv.name = 'realized_volatility'
+        rv.index = pd.to_datetime(rv.index, format=date_format).tz_localize(None).normalize() #Standardize date format to be tz-naive
+        return np.sqrt(rv)
