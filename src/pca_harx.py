@@ -12,7 +12,7 @@ def format_yf_df(price_df:pd.DataFrame, col_name:str='Close', date_format:str='%
     df.index = pd.to_datetime(df.index, format=date_format)
     return df
 
-def get_exo_df(start_date, end_date) -> pd.DataFrame:
+def get_exo_df(start_date:str, end_date:str, date_format:str='%d/%m/%Y') -> pd.DataFrame:
     exo_symbols = ['^VIX', '^VVIX', '^MOVE', '^GVZ', '^OVX']
     exo_df = []
     
@@ -25,15 +25,16 @@ def get_exo_df(start_date, end_date) -> pd.DataFrame:
         }
         tmp = YahooFinance(**params)
         tmp_df = tmp.pipeline()
-        tmp = format_yf_df(tmp_df)
-        tmp.columns = [s]
-        exo_df.append(tmp)
-
-    exo_df = pd.concat(exo_df, axis=1)
-    exo_df.index = pd.to_datetime(exo_df.index, format='%d/%m/%Y')
-    exo_df = exo_df.sort_index(ascending=True)
+        
+        tmp_df = tmp_df.loc[:, ['date', 'Close']]
+        tmp_df.set_index('date', drop=True, inplace=True)
+        tmp_df.index = pd.to_datetime(tmp_df.index, format=date_format)
+        tmp_df = tmp_df.rename(columns={'Close': s})
+        
+        exo_df.append(tmp_df)
     
-    scaled_exo_df = np.log(exo_df/ exo_df.shift(1))
+    exo_df = pd.concat(exo_df, axis=1).sort_index(ascending=True).ffill().dropna() #Use previous day value for bad data
+    scaled_exo_df = np.log(exo_df/ exo_df.shift(1)).replace([np.inf, -np.inf], 0).dropna() #Replace no change with 0
     return scaled_exo_df
 
 class PCADirectHARX:

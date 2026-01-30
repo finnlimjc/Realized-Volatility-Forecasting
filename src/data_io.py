@@ -73,7 +73,7 @@ class AlpacaStockData:
         intraday_df.index = intraday_df.index.droplevel(0)
         return intraday_df
     
-    def intraday_rv(intraday_df:pd.DataFrame, date_format:str='%d/%m/%Y') -> pd.Series:
+    def intraday_rv(self, intraday_df:pd.DataFrame, date_format:str='%d/%m/%Y') -> pd.Series:
         df = intraday_df.copy()
         df['log_returns'] = np.log(df['close']).diff()
         rv = (
