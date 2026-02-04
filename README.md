@@ -95,7 +95,8 @@ $$MSE=\frac{1}{T}\sum^T_{t=1}\left(RV_{t+h-1|t} - F_t\right)^2$$
 $$QLIKE = \frac{1}{T}\sum^T_{t=1}\left(\frac{RV_{t+h-1|t}}{F_t} - log\frac{RV_{t+h-1|t}}{F_t}-1\right)$$
 
 ## Multi-Step Forecast
-Note that a multi-step forecast version was implemented for educational purposes. However, the goal of this project was a one-step ahead forecast, and hence this was not explored:
+Note that a multi-step forecast version was implemented for educational purposes. However, the goal of this project was a one-step ahead forecast, and hence, this was not explored:
+
 $$RV_{t+h-1|t} = \frac{1}{h}\sum^{t+h-1}_{i=t}RV_i, \quad h \geq 1$$
 
 # References
