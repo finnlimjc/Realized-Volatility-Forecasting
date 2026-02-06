@@ -241,12 +241,6 @@ if __name__ == '__main__':
     # Initial Set Up
     st.set_page_config(layout="wide")
     st.header("📊 Realized Volatility Forecasting Model")
-    plt.style.use('seaborn-v0_8-darkgrid')
-    plt.rcParams.update({
-        'figure.facecolor': 'white',
-        'axes.facecolor': 'white',
-        'font.family': 'sans-serif'
-    })
     
     #Parameter Selection
     selector = ParamsSelector()
